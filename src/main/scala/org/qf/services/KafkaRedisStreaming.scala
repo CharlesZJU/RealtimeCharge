@@ -1,7 +1,6 @@
 package org.qf.services
 
 import com.alibaba.fastjson.JSON
-import com.util.Utils
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -10,11 +9,12 @@ import org.apache.spark.SparkConf
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, HasOffsetRanges, KafkaUtils, LocationStrategies}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.qf.utils.MyJedisOffset
 
 /**
   * 直连方式，将offset保存到redis中
   */
-object KafkaRedisStreaming {
+/*object KafkaRedisStreaming {
   // 过滤日志
   Logger.getLogger("org").setLevel(Level.WARN)
   def main(args: Array[String]): Unit = {
@@ -42,7 +42,7 @@ object KafkaRedisStreaming {
     // 将Topic放入数组
     val topics = Array("test2")
     // 获取redis中的kafka偏移量
-    var formdbOffset :Map[TopicPartition,Long] = JedisOffset(groupId)
+    var formdbOffset :Map[TopicPartition,Long] = MyJedisOffset(groupId)
 
     // 拉取kafka数据
     val stream:InputDStream[ConsumerRecord[String,String]] =
@@ -88,12 +88,12 @@ object KafkaRedisStreaming {
           val city = broadcasts.value.get(pcode).toString // 通过省份编号进行取值
           val isSucc  = if(result.equals("0000")) 1 else 0 // 充值成功数
           // 充值时长
-          val costtime :Long = if(result.equals("0000")) Utils.costtime(starttime,endtime) else 0
-          // if(result.equals("0000"))
-          (starttime.substring(0,10),1,fee,city,isSucc,costtime)
-        }).cache()
+////          val costtime :Long = if(result.equals("0000")) Utils.costtime(starttime,endtime) else 0
+//          // if(result.equals("0000"))
+//          (starttime.substring(0,10),1,fee,city,isSucc,costtime)
+//        }).cache()
       // 指标1
-      Utils.jedis2Res(rdd2)
+  /*    Utils.jedis2Res(rdd2)
       // 指标二
 
       // 更新偏移量
@@ -103,9 +103,9 @@ object KafkaRedisStreaming {
         jedis.hset(groupId,or.topic+"-"+or.partition,or.untilOffset.toString)
       }
       jedis.close()
-    })
+    })*/
     // 启动程序
     ssc.start()
     ssc.awaitTermination()
   }
-}
+}*/

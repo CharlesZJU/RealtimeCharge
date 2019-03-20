@@ -6,7 +6,7 @@ import java.util
 /**
   * jdbc连接池
   */
-object JDBCPool {
+object MyJDBCPool {
   private val max = 10 // 连接池总数
   private val connectionNum = 10 // 每次最大连接数
   private val pool = new util.LinkedList[Connection]() // 连接池

@@ -4,13 +4,13 @@ import java.util
 
 import org.apache.kafka.common.TopicPartition
 
-object JedisOffset {
+object MyJedisOffset {
 
   def apply(groupId:String):Map[TopicPartition,Long] ={
     // 创建Map的topic、partition、offset
     var formdbOffset = Map[TopicPartition,Long]()
     // 获取jedis连接
-    val jedis = JedisPool.getConnection()
+    val jedis = MyJedisPool.getConnection()
     // 查询redis的所有kafka相关的topic和partition
     val topicpartitionoffset: util.Map[String, String] = jedis.hgetAll(groupId)
     // 导入隐式转换
