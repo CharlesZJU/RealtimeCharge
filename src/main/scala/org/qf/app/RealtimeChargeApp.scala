@@ -67,9 +67,6 @@ object RealtimeChargeApp {
         .foreachPartition(log_json_ite => {
         //获取所需连接
         lazy val jedis: Jedis = MyJedisPool.getConnection()
-        lazy val jdbc: Connection = MyJDBCPool.getConnections()
-        lazy val sparkSession: SparkSession = SparkSession.builder().config(sparkConf).getOrCreate()
-
         //计算分区内的数据
         log_json_ite.foreach(log_json => {
           //            业务结果  0000 成功，其它返回错误编码
@@ -78,15 +75,27 @@ object RealtimeChargeApp {
           val receiveNotifyTime: String = log_json.getString("receiveNotifyTime")
           val provinceCode: Int = log_json.getIntValue("provinceCode")
 
-          //            交易总量、总额度、成功数、每小时数据
+          // 数据上传到redis
           GeneralSituation.updateData2Redis(jedis, bussinessRst, chargefee, receiveNotifyTime, provinceCode)
         })
-
-        // TODO:  从redis中更新数据到mysql
-
       })
+      // 更新偏移量
+      val jedis = MyJedisPool.getConnection()
+      lazy val myjdbc: Connection = MyJDBCPool.getConnections()
+      lazy val sparkSession: SparkSession = SparkSession.builder().config(sparkConf).getOrCreate()
+      // 获取offset信息
+      for(or <- offsetRange){
+        jedis.hset(kafka_pro_map.get("group.id").toString,or.topic+"-"+or.partition,or.untilOffset.toString)
+      }
+        GeneralSituation.redis2Mysql(jedis,myjdbc,sparkSession)
+      jedis.close()
+      MyJDBCPool.returnConn(myjdbc)
+      sparkSession.close()
     })
 
+  // 启动程序
+  streamingContext.start()
+  streamingContext.awaitTermination()
 
   }
 

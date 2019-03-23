@@ -1,8 +1,9 @@
 package org.qf.services
 
-import java.lang
-import java.sql.Connection
+import java.{lang, util}
 
+import com.mysql.jdbc
+import com.mysql.jdbc.Connection
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.SparkSession
 import redis.clients.jedis.Jedis
@@ -43,6 +44,20 @@ object GeneralSituation extends Service {
         jedis.hincrBy(s"RTC:failorderP$hour", provincecode, 1)
       }
     }
+  }
+
+  def updateFailOrder(jedis: Jedis, connection: Connection, session: SparkSession): Unit = {
+
+  }
+
+  def updateOrderMoneyPH(jedis: Jedis, connection: Connection, session: SparkSession): Unit = {
+    val orderPH: util.Map[String, String] = jedis.hgetAll("RTC:orderPH")
+    val moneyPH: util.Map[String, String] = jedis.hgetAll("RTC:moneyPH")
+  }
+
+  override def redis2Mysql(jedis: Jedis, myjdbc:Connection, sparkSession: SparkSession, args: Any*): Unit = {
+    updateFailOrder(jedis: Jedis, myjdbc:Connection, sparkSession: SparkSession)
+    updateOrderMoneyPH(jedis: Jedis, myjdbc:Connection, sparkSession: SparkSession)
   }
 }
 
